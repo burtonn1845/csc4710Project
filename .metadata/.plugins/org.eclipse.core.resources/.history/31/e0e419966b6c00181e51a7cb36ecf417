@@ -1,0 +1,162 @@
+package user.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import user.domain.User;
+
+
+
+/**
+ * DDL functions performed in database
+ * @author changxin bai
+ *
+ */
+public class UserDao {
+	
+	
+	/**
+	 * get the search result with username 
+	 * @param username
+	 * @return
+	 * @throws ClassNotFoundException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 */
+	public User findByUsername(String username) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		User user = new User();
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager
+			          .getConnection("jdbc:mysql://localhost:3306/bookstore?"
+				              + "user=root&password=root");
+		    String sql = "select * from tb_user where username=?";
+		    PreparedStatement preparestatement = connect.prepareStatement(sql); 
+		    preparestatement.setString(1,username);
+		    ResultSet resultSet = preparestatement.executeQuery();
+		    //ResultSet resultSet  = preparestatement.executeUpdate();
+		    while(resultSet.next()){
+		    	String user_name = resultSet.getString("username");
+		    	if(user_name.equals(username)){
+		    		user.setUsername(resultSet.getString("username"));
+		    		user.setPassword(resultSet.getString("password"));
+		    		user.setEmail(resultSet.getString("email"));
+		    		
+		    	}
+		    }
+		
+		    
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return user;
+	}
+	
+	
+	
+	
+	/**
+	 * insert User
+	 * @param user
+	 * @throws ClassNotFoundException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 */
+	public void add(User user) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager
+			          .getConnection("jdbc:mysql://localhost:3306/bookstore?"
+				              + "user=root&password=root");
+			
+			
+			String sql = "insert into tb_user values(?,?,?)";
+			PreparedStatement preparestatement = connect.prepareStatement(sql); 
+		    preparestatement.setString(1,user.getUsername());
+		    preparestatement.setString(2,user.getPassword());
+		    preparestatement.setString(3,user.getEmail());
+		    preparestatement.executeUpdate();
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
+	public List<Object> findall() throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		List<Object> list = new ArrayList<>();
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager
+			          .getConnection("jdbc:mysql://localhost:3306/bookstore?"
+				              + "user=root&password=root");
+			
+			
+			String sql = "select * from tb_user";
+			PreparedStatement preparestatement = connect.prepareStatement(sql); 
+			ResultSet resultSet = preparestatement.executeQuery();
+			
+			while(resultSet.next()){
+				User user = new User();
+				user.setUsername(resultSet.getString("username"));
+	    		user.setPassword(resultSet.getString("password"));
+	    		user.setEmail(resultSet.getString("email"));
+	    		list.add(user);
+			 }
+			 
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return list;
+		
+	}
+	
+	public void initDao() throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+		Class.forName("com.mysql.jdbc.Driver").newInstance();
+		Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+	              + "user=root&password=root");
+		
+	
+		
+		//String stmt = "insert into tb_user values ('name2','pass','email@mail.com')";
+		String paper = "create table if not exists paper(paperid integer not null auto_increment, "
+				+ "title varchar(50), "
+				+ "abstract varchar(250), "
+				+ "pdf varchar(100),"
+				+ "primary key (paperid))";
+		PreparedStatement paperstmt = connect.prepareStatement(paper);
+		paperstmt.executeUpdate();
+		
+		String author = "create table if not exists author(email varchar(100), "
+				+ "name varchar(50), "
+				+ "affiliation varchar(100), "
+				+ "primary key (email))";
+		PreparedStatement authorstmt = connect.prepareStatement(author);
+		authorstmt.executeUpdate();
+		
+		String write = "create table if not exists written(paperid integer,"
+				+ "email varchar(50), "
+				+ "order integer, "
+				+ "primary key (paperid))";
+				//+ "foreign key paperid references paper(paperid), "
+				//+ "foreign key email references author(email))";
+		PreparedStatement writestmt = connect.prepareStatement(write);
+		writestmt.executeUpdate();
+		
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
+		
+}
