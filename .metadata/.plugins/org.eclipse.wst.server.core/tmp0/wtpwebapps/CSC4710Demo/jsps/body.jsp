@@ -27,5 +27,7 @@
       <input type="hidden" name="method" value="init"/>
       <input type="submit" value="init"/>
       </form>
+      <a href="<c:url value='/jsps/user/search.jsp'/>" target="_parent">Search Authors</a>
+      <a href="<c:url value='/jsps/user/paperproperties.jsp'/>" target="_parent">View Paper Properties</a>
   </body>
 </html>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;CSC4710Demo/WebContent/jsps/user/update.jsp&apos; to &apos;updatepcm.jsp&apos;" description="Rename resource &apos;update.jsp&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="WebContent/jsps/user/update.jsp" name="updatepcm.jsp" stamp="1530425228434" updateReferences="true"/>
+</session>

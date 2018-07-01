@@ -42,6 +42,9 @@
 			Hello：${sessionScope.session_user.username };
 			<a href="<c:url value='/jsps/item.jsp'/>" target="body">Query Result</a>&nbsp;&nbsp;
 			<a href="<c:url value='/jsps/user/assign.jsp'/>" target="_parent">Assign</a>
+			<a href="<c:url value='/jsps/user/updatepcm.jsp'/>" target="_parent">Update PC Members</a>
+			<a href="<c:url value='/jsps/user/updatepaper.jsp'/>" target="_parent">Update Papers</a>
+			<a href="<c:url value='/jsps/user/updaterev.jsp'/>" target="_parent">Update Reviews</a>
 		</c:otherwise>
 	</c:choose>
 
