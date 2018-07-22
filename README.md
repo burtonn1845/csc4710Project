@@ -15,3 +15,10 @@ Open the .war file in eclipse.
 
 Right click the main.jsp file, run as -> run on server.
 
+Use:
+
+Able to create and modify logins.
+
+Able to create and modify pc members that can create and modify papers and reviews.
+
+Can view paper properties such as most reviewed papers, accepted papers, etc.
