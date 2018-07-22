@@ -28,7 +28,7 @@
   3. 回显
    --%>
 <p style="color: red; font-weight: 900">${msg }</p>
-<form action="<c:url value='/UserServletUpdate'/>" method="post">
+<form action="<c:url value='/RejectSearch'/>" method="post">
 	<input type="hidden" name="method" value="update"/>
 	Name:<input type="text" name="name" value="${form.name }"/>
 	<span style="color: red; font-weight: 900">${errors.name }</span>
@@ -39,10 +39,10 @@
 	<input type="submit" value="Submit"/>
 </form>
 <br/>
-<a href="<c:url value='/jsps/user/paperproperties.jsp'/>" target="_parent">View Most Review Numbers</a>
+<a href="<c:url value='/MostReview'/>" target="body">View Most Review Numbers</a>
 <br/>
-<a href="<c:url value='/jsps/user/paperproperties.jsp'/>" target="_parent">View Members with no Reviews</a>
+<a href="<c:url value='/NoReview'/>" target="body">View Members with no Reviews</a>
 <br/>
-<a href="<c:url value='/jsps/user/paperproperties.jsp'/>" target="_parent">View All Accepted Papers</a>
+<a href="<c:url value='/AcceptedView'/>" target="body">View All Accepted Papers</a>
   </body>
 </html>

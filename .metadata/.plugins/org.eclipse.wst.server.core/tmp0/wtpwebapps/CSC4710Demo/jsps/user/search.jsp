@@ -28,7 +28,7 @@
   3. 回显
    --%>
 <p style="color: red; font-weight: 900">${msg }</p>
-<form action="<c:url value='/UserServletUpdate'/>" method="post">
+<form action="<c:url value='/UserServletSingleAuthSearch'/>" method="post">
 	<input type="hidden" name="method" value="update"/>
 	Name:<input type="text" name="name" value="${form.name }"/>
 	<span style="color: red; font-weight: 900">${errors.name }</span>
@@ -37,7 +37,7 @@
 </form>
 <h1>1st Author</h1>
 <p style="color: red; font-weight: 900">${msg }</p>
-<form action="<c:url value='/UserServletUpdate'/>" method="post">
+<form action="<c:url value='/UserServletFirstAuthSearch'/>" method="post">
 	<input type="hidden" name="method" value="update"/>
 	Name:<input type="text" name="name" value="${form.name }"/>
 	<span style="color: red; font-weight: 900">${errors.name }</span>
@@ -46,7 +46,7 @@
 </form>
 <h1>Two Authors Papers</h1>
 <p style="color: red; font-weight: 900">${msg }</p>
-<form action="<c:url value='/UserServletUpdate'/>" method="post">
+<form action="<c:url value='/UserServletTwoAuthSearch'/>" method="post">
 	<input type="hidden" name="method" value="update"/>
 	Name:<input type="text" name="name" value="${form.name }"/>
 	<span style="color: red; font-weight: 900">${errors.name }</span>

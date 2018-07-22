@@ -28,7 +28,7 @@
   3. 回显
    --%>
 <p style="color: red; font-weight: 900">${msg }</p>
-<form action="<c:url value='/UserServletUpdate'/>" method="post">
+<form action="<c:url value='/UserServletUpdatepcm'/>" method="post">
 	<input type="hidden" name="method" value="update"/>
 	PC Member Name to Search:<input type="text" name="pcmembers" value="${form.pcmembers }"/>
 	<span style="color: red; font-weight: 900">${errors.pcmembers }</span>
@@ -43,10 +43,22 @@
 </form>
 <h1>Delete PC Members</h1>
 <p style="color: red; font-weight: 900">${msg }</p>
-<form action="<c:url value='/UserServletUpdate'/>" method="post">
+<form action="<c:url value='/UserServletDeletepcm'/>" method="post">
 	<input type="hidden" name="method" value="update"/>
-	PC Member Name:<input type="text" name="pcmembers" value="${form.pcmembers }"/>
-	<span style="color: red; font-weight: 900">${errors.pcmembers }</span>
+	PC Member Name:<input type="text" name="dpcmembers" value="${form.dpcmembers }"/>
+	<span style="color: red; font-weight: 900">${errors.dpcmembers }</span>
+	<br/>
+	<input type="submit" value="Submit"/>
+</form>
+<h1>New PC Members</h1>
+<p style="color: red; font-weight: 900">${msg }</p>
+<form action="<c:url value='/UserServletNewpcm'/>" method="post">
+	<input type="hidden" name="method" value="update"/>
+	PC Member Name:<input type="text" name="npcmembers" value="${form.npcmembers }"/>
+	<span style="color: red; font-weight: 900">${errors.npcmembers }</span>
+	<br/>
+	PC Member Email：<input type="text" name="npcemail" value="${form.npcemail }"/>
+	<span style="color: red; font-weight: 900">${errors.npcemail }</span>
 	<br/>
 	<input type="submit" value="Submit"/>
 </form>

@@ -1,0 +1,931 @@
+package user.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import user.domain.User;
+
+
+
+/**
+ * DDL functions performed in database
+ * @author changxin bai
+ *
+ */
+public class UserDao {
+	
+	
+	/**
+	 * get the search result with username 
+	 * @param username
+	 * @return
+	 * @throws ClassNotFoundException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 */
+	public User findByUsername(String username) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		User user = new User();
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager
+			          .getConnection("jdbc:mysql://localhost:3306/sampledb?"
+				              + "user=root&password=root");
+		    String sql = "select * from tb_user where username=?";
+		    PreparedStatement preparestatement = connect.prepareStatement(sql); 
+		    preparestatement.setString(1,username);
+		    ResultSet resultSet = preparestatement.executeQuery();
+		    //ResultSet resultSet  = preparestatement.executeUpdate();
+		    while(resultSet.next()){
+		    	String user_name = resultSet.getString("username");
+		    	if(user_name.equals(username)){
+		    		user.setUsername(resultSet.getString("username"));
+		    		user.setPassword(resultSet.getString("password"));
+		    		user.setEmail(resultSet.getString("email"));
+		    		
+		    	}
+		    }
+		
+		    
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return user;
+	}
+	
+	
+	
+	
+	/**
+	 * insert User
+	 * @param user
+	 * @throws ClassNotFoundException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 */
+	public void add(User user) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager
+			          .getConnection("jdbc:mysql://localhost:3306/sampledb?"
+				              + "user=root&password=root");
+			
+			
+			String sql = "insert into tb_user values(?,?,?)";
+			PreparedStatement preparestatement = connect.prepareStatement(sql); 
+		    preparestatement.setString(1,user.getUsername());
+		    preparestatement.setString(2,user.getPassword());
+		    preparestatement.setString(3,user.getEmail());
+		    preparestatement.executeUpdate();
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
+	public List<Object> findall() throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		List<Object> list = new ArrayList<>();
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager
+			          .getConnection("jdbc:mysql://localhost:3306/sampledb?"
+				              + "user=root&password=root");
+			
+			
+			String sql = "select * from tb_user";
+			PreparedStatement preparestatement = connect.prepareStatement(sql); 
+			ResultSet resultSet = preparestatement.executeQuery();
+			
+			while(resultSet.next()){
+				User user = new User();
+				user.setUsername(resultSet.getString("username"));
+	    		user.setPassword(resultSet.getString("password"));
+	    		user.setEmail(resultSet.getString("email"));
+	    		list.add(user);
+			 }
+			 
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return list;
+		
+	}
+	public List<Object> findSingleName(String name) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		List<Object> list = new ArrayList<>();
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager
+			          .getConnection("jdbc:mysql://localhost:3306/sampledb?"
+				              + "user=root&password=root");
+			
+			int PID = 0;
+			int nCount=0;
+			String rEmail = null;
+			
+			String sql = "select email from author where name = ?";
+			//String sql = "select email from author where name = ?";
+			PreparedStatement preparestatement = connect.prepareStatement(sql);
+			preparestatement.setString(1, name);
+			ResultSet emailResult = preparestatement.executeQuery();
+			
+			while(emailResult.next()) {
+				rEmail = emailResult.getString("email");
+			}
+			
+			String findPID = "select paperid from written where email = ?";
+			PreparedStatement findPIDstmt = connect.prepareStatement(findPID);
+			findPIDstmt.setString(1, rEmail);
+			ResultSet pidResult = findPIDstmt.executeQuery();
+			while(pidResult.next()) {
+				PID = pidResult.getInt("paperid");
+				
+				String count = "select count(*) from written where paperid = ? group by paperid";
+				PreparedStatement findCount = connect.prepareStatement(count);
+				findCount.setInt(1, PID);
+				ResultSet resultCount = findCount.executeQuery();
+				while(resultCount.next()) {
+					nCount = resultCount.getInt("count(*)");
+				}
+				if( nCount == 1) {
+					String findPaperName = "select title from paper where paperid = ?";
+					PreparedStatement findPNamestmt = connect.prepareStatement(findPaperName);
+					findPNamestmt.setInt(1, PID);
+					ResultSet resultPNames = findPNamestmt.executeQuery();
+					while(resultPNames.next()) {
+						User user = new User();
+						user.setEmail(resultPNames.getString("title"));
+						list.add(user);
+					}
+				}
+			}
+			
+		/*	while(resultSet.next()){
+				User user = new User();
+				user.setEmail(resultSet.getString("email"));
+	    		list.add(user);
+			 }*/
+			 
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return list;
+		
+	}
+	public List<Object> findFirstName(String name) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		List<Object> list = new ArrayList<>();
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager
+			          .getConnection("jdbc:mysql://localhost:3306/sampledb?"
+				              + "user=root&password=root");
+			
+			int PID = 0;
+			String rEmail = null;
+			
+			String sql = "select email from author where name = ?";
+			//String sql = "select email from author where name = ?";
+			PreparedStatement preparestatement = connect.prepareStatement(sql);
+			preparestatement.setString(1, name);
+			ResultSet emailResult = preparestatement.executeQuery();
+			
+			while(emailResult.next()) {
+				rEmail = emailResult.getString("email");
+			}
+			
+			String findPID = "select paperid from written where email = ? and contribution = 1";
+			PreparedStatement findPIDstmt = connect.prepareStatement(findPID);
+			findPIDstmt.setString(1, rEmail);
+			ResultSet pidResult = findPIDstmt.executeQuery();
+			while(pidResult.next()) {
+				PID = pidResult.getInt("paperid");
+				
+				String findPaperName = "select title from paper where paperid = ?";
+				PreparedStatement findPNamestmt = connect.prepareStatement(findPaperName);
+				findPNamestmt.setInt(1, PID);
+				ResultSet resultPNames = findPNamestmt.executeQuery();
+				while(resultPNames.next()) {
+					User user = new User();
+					user.setEmail(resultPNames.getString("title"));
+					list.add(user);
+				}
+				
+			}
+			
+		/*	while(resultSet.next()){
+				User user = new User();
+				user.setEmail(resultSet.getString("email"));
+	    		list.add(user);
+			 }*/
+			 
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return list;
+		
+	}
+	public List<Object> findTwoName(String name, String sname) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		List<Object> list = new ArrayList<>();
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager
+			          .getConnection("jdbc:mysql://localhost:3306/sampledb?"
+				              + "user=root&password=root");
+			
+			int PID = 0;
+			int PID2 = 0;
+			String rEmail = null;
+			String rEmail2 = null;
+			String sql = "select email from author where name = ?";
+			//String sql = "select email from author where name = ?";
+			PreparedStatement preparestatement = connect.prepareStatement(sql);
+			preparestatement.setString(1, name);
+			ResultSet emailResult = preparestatement.executeQuery();
+			
+			while(emailResult.next()) {
+				rEmail = emailResult.getString("email");
+			}
+			String sql2 = "select email from author where name = ?";
+			//String sql = "select email from author where name = ?";
+			PreparedStatement preparestatement2 = connect.prepareStatement(sql2);
+			preparestatement2.setString(1, sname);
+			ResultSet emailResult2 = preparestatement2.executeQuery();
+			
+			while(emailResult2.next()) {
+				rEmail2 = emailResult2.getString("email");
+			}
+			
+			String findPID = "select paperid from written where email = ?";
+			PreparedStatement findPIDstmt = connect.prepareStatement(findPID);
+			findPIDstmt.setString(1, rEmail);
+			ResultSet pidResult = findPIDstmt.executeQuery();
+			while(pidResult.next()) {
+				PID = pidResult.getInt("paperid");
+				
+				String findPID2 = "select paperid from written where email = ?";
+				PreparedStatement findPIDstmt2 = connect.prepareStatement(findPID2);
+				findPIDstmt2.setString(1, rEmail2);
+				ResultSet pidResult2 = findPIDstmt2.executeQuery();
+				while(pidResult2.next()) {
+					PID2 = pidResult2.getInt("paperid");
+				
+					if(PID == PID2) {
+						String findPaperName = "select title from paper where paperid = ?";
+						PreparedStatement findPNamestmt = connect.prepareStatement(findPaperName);
+						findPNamestmt.setInt(1, PID);
+						ResultSet resultPNames = findPNamestmt.executeQuery();
+						while(resultPNames.next()) {
+							User user = new User();
+							user.setEmail(resultPNames.getString("title"));
+							list.add(user);
+						}
+					}
+				}
+				
+			}
+			
+		/*	while(resultSet.next()){
+				User user = new User();
+				user.setEmail(resultSet.getString("email"));
+	    		list.add(user);
+			 }*/
+			 
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return list;
+		
+	}
+	
+	public void initDao() throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+		Class.forName("com.mysql.jdbc.Driver").newInstance();
+		Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+	              + "user=root&password=root");
+		
+	
+		
+		//String stmt = "insert into tb_user values ('name2','pass','email@mail.com')";
+		String paper = "create table if not exists paper(paperid integer not null auto_increment, "
+				+ "title varchar(50), "
+				+ "abstract varchar(250), "
+				+ "pdf varchar(100),"
+				+ "primary key (paperid))";
+		PreparedStatement paperstmt = connect.prepareStatement(paper);
+		paperstmt.executeUpdate();
+		
+		String author = "create table if not exists author(email varchar(50), "
+				+ "name varchar(50), "
+				+ "affiliation varchar(100), "
+				+ "primary key (email))";
+		PreparedStatement authorstmt = connect.prepareStatement(author);
+		authorstmt.executeUpdate();
+		
+		String write = "create table if not exists written(paperid integer,"
+				+ "email varchar(50), "
+				+ "contribution integer, "
+				+ "primary key (paperid, email), "
+				+ "foreign key (paperid) references paper(paperid) on update cascade on delete cascade, "
+				+ "foreign key (email) references author(email) on update cascade on delete cascade)";
+		PreparedStatement writestmt = connect.prepareStatement(write);
+		writestmt.executeUpdate();
+		
+		String pc = "create table if not exists pcmember(email varchar(50), "
+				+ "name varchar(50), "
+				+ "primary key (email, name))";
+		PreparedStatement pcstmt = connect.prepareStatement(pc);
+		pcstmt.executeUpdate();
+		
+		String review = "create table if not exists review(reportid integer not null auto_increment, "
+				+ "sdate date, "
+				+ "comment varchar(250), "
+				+ "recommendation char(1), "
+				+ "paperid integer, "
+				+ "email varchar(50), "
+				+ "primary key (reportid), "
+				+ "foreign key (paperid) references paper(paperid) on update cascade on delete cascade, "
+				+ "foreign key (email) references pcmember(email) on update cascade on delete cascade)";
+		PreparedStatement reviewstmt = connect.prepareStatement(review);
+		reviewstmt.executeUpdate();
+		
+		String reg = "create table if not exists tb_user(username varchar(50), "
+				+ "`password` varchar(50) not null, "
+				+ "email varchar(50) not null, "
+				+ "primary key(email), "
+				+ "foreign key (email, username) references pcmember(email, name) on update cascade on delete cascade)";
+		PreparedStatement regstmt = connect.prepareStatement(reg);
+		regstmt.executeUpdate();
+		
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
+	
+	public void populateDB(int id, String namedb, String emaildb, String pwdb, String titledb, String affiliationdb, String datedb, String abstractdb) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+		              + "user=root&password=root");
+			
+			String paper = "insert ignore into paper values(?,?,?,?)";
+			PreparedStatement paperstmt = connect.prepareStatement(paper);
+			paperstmt.setInt(1,  id);
+			paperstmt.setString(2, titledb);
+			paperstmt.setString(3, abstractdb);
+			paperstmt.setString(4, "pdflinkhere");
+			paperstmt.executeUpdate();
+			
+			String author = "insert ignore into author values(?,?,?)";
+			PreparedStatement authorstmt = connect.prepareStatement(author);
+			authorstmt.setString(1, emaildb);
+			authorstmt.setString(2, namedb);
+			authorstmt.setString(3, affiliationdb);
+			authorstmt.executeUpdate();
+			
+			String write = "insert ignore into written values(?,?,?)";
+			PreparedStatement writestmt = connect.prepareStatement(write);
+			writestmt.setInt(1, id);
+			writestmt.setString(2, emaildb);
+			writestmt.setInt(3, 1);
+			writestmt.executeUpdate();
+			
+			String pc = "insert ignore into pcmember values(?,?)";
+			PreparedStatement pcstmt = connect.prepareStatement(pc);
+			pcstmt.setString(1, emaildb);
+			pcstmt.setString(2, namedb);
+			pcstmt.executeUpdate();
+			
+			String review = "insert ignore into review values(?,?,?,?,?,?)";
+			PreparedStatement reviewstmt = connect.prepareStatement(review);
+			reviewstmt.setInt(1, id);
+			reviewstmt.setDate(2, java.sql.Date.valueOf(datedb));
+			reviewstmt.setString(3, abstractdb);
+			reviewstmt.setString(4, "Y");
+			reviewstmt.setInt(5, id);
+			reviewstmt.setString(6, emaildb);
+			reviewstmt.executeUpdate();
+			
+			String reg = "insert ignore into tb_user values(?,?,?)";
+			PreparedStatement regstmt = connect.prepareStatement(reg);
+			regstmt.setString(1, namedb);
+			regstmt.setString(2, pwdb);
+			regstmt.setString(3, emaildb);
+			regstmt.executeUpdate();
+			
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public void assign(String papername, String rev1, String rev2, String rev3) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+		              + "user=root&password=root");
+			
+			int pID = 0;
+			String r1 = null, r2 = null, r3 = null;
+			
+		    String findpID = "select paperid from paper where title=?";
+		    PreparedStatement findpIDstmt = connect.prepareStatement(findpID); 
+		    findpIDstmt.setString(1,papername);
+		    ResultSet pidresult = findpIDstmt.executeQuery();
+		    //ResultSet resultSet  = preparestatement.executeUpdate();
+		    while(pidresult.next()){
+		    	pID = pidresult.getInt("paperid");	
+		    	}
+		    		
+		    String findrev1 = "select email from pcmember where name=?";
+		    PreparedStatement findrev1stmt = connect.prepareStatement(findrev1);
+		    findrev1stmt.setString(1, rev1);
+		    ResultSet rev1result = findrev1stmt.executeQuery();
+		    //ResultSet resultSet  = preparestatement.executeUpdate();
+		    while(rev1result.next()){
+		    	r1 = rev1result.getString("email");
+		    	}
+		
+		    String findrev2 = "select email from pcmember where name=?";
+		    PreparedStatement findrev2stmt = connect.prepareStatement(findrev2);
+		    findrev2stmt.setString(1, rev2);
+		    ResultSet rev2result = findrev2stmt.executeQuery();
+		    //ResultSet resultSet  = preparestatement.executeUpdate();
+		    while(rev2result.next()){
+		    	r2 = rev2result.getString("email");
+		    	}
+		    
+		    String findrev3 = "select email from pcmember where name=?";
+		    PreparedStatement findrev3stmt = connect.prepareStatement(findrev3);
+		    findrev3stmt.setString(1, rev3);
+		    ResultSet rev3result = findrev3stmt.executeQuery();
+		    //ResultSet resultSet  = preparestatement.executeUpdate();
+		    while(rev3result.next()){
+		    	r3 = rev3result.getString("email");
+		    	}
+		    
+			String review1 = "insert ignore into review (paperid,email) values(?,?)";
+			PreparedStatement reviewstmt1 = connect.prepareStatement(review1);
+			//reviewstmt1.setDate(1, java.sql.Date.valueOf("2018-6-10"));
+			//reviewstmt1.setString(2, "9/10 paper would recommend.");
+			//reviewstmt1.setString(3, "Y");
+			reviewstmt1.setInt(1, pID);
+			reviewstmt1.setString(2, r1);
+			reviewstmt1.executeUpdate();
+			
+			String review2 = "insert ignore into review (paperid,email) values(?,?)";
+			PreparedStatement reviewstmt2 = connect.prepareStatement(review2);
+			/*reviewstmt2.setDate(1, java.sql.Date.valueOf("2018-6-10"));
+			reviewstmt2.setString(2, "9/10 paper would recommend.");
+			reviewstmt2.setString(3, "Y");*/
+			reviewstmt2.setInt(1, pID);
+			reviewstmt2.setString(2, r2);
+			reviewstmt2.executeUpdate();
+			
+			String review3 = "insert ignore into review (paperid,email) values(?,?)";
+			PreparedStatement reviewstmt3 = connect.prepareStatement(review3);
+			/*reviewstmt3.setDate(1, java.sql.Date.valueOf("2018-6-10"));
+			reviewstmt3.setString(2, "9/10 paper would recommend.");
+			reviewstmt3.setString(3, "Y");*/
+			reviewstmt3.setInt(1, pID);
+			reviewstmt3.setString(2, r3);
+			reviewstmt3.executeUpdate();
+		    
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+			
+		
+	}
+	public void updatepcm(String updateName, String newName, String newEmail) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+		              + "user=root&password=root");
+			
+
+			
+				if(newName == "") {
+					String updatepcm= "update pcmember set email = ? where name = ?";
+					PreparedStatement updatePCMstatement = connect.prepareStatement(updatepcm);
+					updatePCMstatement.setString(1, newEmail);
+					updatePCMstatement.setString(2, updateName);
+					updatePCMstatement.executeUpdate();
+				}
+				else if(newEmail == "") {
+					String updatepcm= "update pcmember set name = ? where name = ?";
+					PreparedStatement updatePCMstatement = connect.prepareStatement(updatepcm);
+					updatePCMstatement.setString(1, newName);
+					updatePCMstatement.setString(2, updateName);
+					updatePCMstatement.executeUpdate();
+				}
+				else {
+					String updatepcm= "update pcmember set name = ?, email = ? where name = ?";
+					PreparedStatement updatePCMstatement = connect.prepareStatement(updatepcm);
+					updatePCMstatement.setString(1, newName);
+					updatePCMstatement.setString(2, newEmail);
+					updatePCMstatement.setString(3, updateName);
+					updatePCMstatement.executeUpdate();
+				}
+			
+
+
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public void deletepcm(String deleteName) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+		              + "user=root&password=root");
+
+					String updatepcm= "delete from pcmember where name = ?";
+					PreparedStatement updatePCMstatement = connect.prepareStatement(updatepcm);
+					updatePCMstatement.setString(1, deleteName);
+					updatePCMstatement.executeUpdate();
+
+
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public void newpcm(String name, String email) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+		              + "user=root&password=root");
+
+					String updatepcm= "insert into pcmember(email, name) values (?,?)";
+					PreparedStatement updatePCMstatement = connect.prepareStatement(updatepcm);
+					updatePCMstatement.setString(1, email);
+					updatePCMstatement.setString(2, name);
+					updatePCMstatement.executeUpdate();
+
+
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public void updatepaper(String updateName, String newTitle, String newAbs, String newPdf) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+		              + "user=root&password=root");
+			
+
+				if(newTitle == "" && newAbs=="") {
+					String updatepaper= "update paper set pdf = ? where title = ?";
+					PreparedStatement updatepaperstatement = connect.prepareStatement(updatepaper);
+					updatepaperstatement.setString(1, newPdf);
+					updatepaperstatement.setString(2, updateName);
+					updatepaperstatement.executeUpdate();
+				}
+				else if(newTitle == "" && newPdf=="") {
+					String updatepaper= "update paper set abstract = ? where title = ?";
+					PreparedStatement updatepaperstatement = connect.prepareStatement(updatepaper);
+					updatepaperstatement.setString(1, newAbs);
+					updatepaperstatement.setString(2, updateName);
+					updatepaperstatement.executeUpdate();
+				}
+				else if(newAbs == "" && newPdf=="") {
+					String updatepaper= "update paper set title = ? where title = ?";
+					PreparedStatement updatepaperstatement = connect.prepareStatement(updatepaper);
+					updatepaperstatement.setString(1, newTitle);
+					updatepaperstatement.setString(2, updateName);
+					updatepaperstatement.executeUpdate();
+				}
+				else if(newTitle == "") {
+					String updatepaper= "update paper set abstract = ?, pdf = ? where title = ?";
+					PreparedStatement updatepaperstatement = connect.prepareStatement(updatepaper);
+					updatepaperstatement.setString(1, newAbs);
+					updatepaperstatement.setString(2, newPdf);
+					updatepaperstatement.setString(3, updateName);
+					updatepaperstatement.executeUpdate();
+				}
+				else if(newAbs == "") {
+					String updatepaper= "update paper set title = ?, pdf = ? where title = ?";
+					PreparedStatement updatepaperstatement = connect.prepareStatement(updatepaper);
+					updatepaperstatement.setString(1, newTitle);
+					updatepaperstatement.setString(2, newPdf);
+					updatepaperstatement.setString(3, updateName);
+					updatepaperstatement.executeUpdate();
+				}
+				else if(newPdf == "") {
+					String updatepaper= "update paper set title = ?, abstract = ? where title = ?";
+					PreparedStatement updatepaperstatement = connect.prepareStatement(updatepaper);
+					updatepaperstatement.setString(1, newTitle);
+					updatepaperstatement.setString(2, newAbs);
+					updatepaperstatement.setString(3, updateName);
+					updatepaperstatement.executeUpdate();
+				}
+				else {
+					String updatepaper= "update paper set title = ?, abstract = ?, pdf = ? where title = ?";
+					PreparedStatement updatepaperstatement = connect.prepareStatement(updatepaper);
+					updatepaperstatement.setString(1, newTitle);
+					updatepaperstatement.setString(2, newAbs);
+					updatepaperstatement.setString(3, newPdf);
+					updatepaperstatement.setString(4, updateName);
+					updatepaperstatement.executeUpdate();
+				}
+			
+
+
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public void deletepaper(String deleteName) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+		              + "user=root&password=root");
+
+					String updatepaper= "delete from paper where title = ?";
+					PreparedStatement updatepaperstatement = connect.prepareStatement(updatepaper);
+					updatepaperstatement.setString(1, deleteName);
+					updatepaperstatement.executeUpdate();
+
+
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public void newpaper(String title, String abs, String pdf, String authors, String emails, String affil, String con, String authors2, String emails2, String affil2, String con2) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+		              + "user=root&password=root");
+
+					String updatepaper= "insert ignore into paper(title,abstract,pdf) values (?,?,?)";
+					PreparedStatement updatepaperstatement = connect.prepareStatement(updatepaper);
+					updatepaperstatement.setString(1, title);
+					updatepaperstatement.setString(2, abs);
+					updatepaperstatement.setString(3, pdf);
+					updatepaperstatement.executeUpdate();
+					
+					String a1 = null, a2 = null;
+					int paperid = 0;
+					int insys1 = 0;
+					
+				    String getpaperID = "select paperid from paper where title=?";
+				    PreparedStatement getPaperIDstmt = connect.prepareStatement(getpaperID); 
+				    getPaperIDstmt.setString(1,title);
+				    ResultSet paperIDresult = getPaperIDstmt.executeQuery();
+				    //ResultSet resultSet  = preparestatement.executeUpdate();
+				    while(paperIDresult.next()){
+				    	paperid = paperIDresult.getInt("paperid");
+				    	}
+					
+				   /* String checkAuth = "select name from author where name=?";
+				    PreparedStatement checkAuthstmt = connect.prepareStatement(checkAuth); 
+				    checkAuthstmt.setString(1,authors);
+				    ResultSet authresult = checkAuthstmt.executeQuery();
+				    //ResultSet resultSet  = preparestatement.executeUpdate();
+				    while(authresult.next()){
+				    	a1 = authresult.getString("name");	
+				    	if(a1 == authors) {
+				    		insys1 = 1;
+				    	}
+				    	}
+				    if(insys1 == 0) {*/
+				    	String updateauth= "insert ignore into author(email, name, affiliation) values(?,?,?)";
+				    	PreparedStatement updateauthstmt = connect.prepareStatement(updateauth);
+				    	updateauthstmt.setString(1, emails);
+				    	updateauthstmt.setString(2, authors);
+				    	updateauthstmt.setString(3, affil);
+				    	updateauthstmt.executeUpdate();
+				    //}
+				    
+						   /* String checkAuth = "select name from author where name=?";
+					    PreparedStatement checkAuthstmt = connect.prepareStatement(checkAuth); 
+					    checkAuthstmt.setString(1,authors);
+					    ResultSet authresult = checkAuthstmt.executeQuery();
+					    //ResultSet resultSet  = preparestatement.executeUpdate();
+					    while(authresult.next()){
+					    	a1 = authresult.getString("name");	
+					    	if(a1 == authors) {
+					    		insys1 = 1;
+					    	}
+					    	}
+					    if(insys1 == 0) {*/
+					    	String updateauth2= "insert ignore into author(email, name, affiliation) values(?,?,?)";
+					    	PreparedStatement updateauthstmt2 = connect.prepareStatement(updateauth2);
+					    	updateauthstmt2.setString(1, emails2);
+					    	updateauthstmt2.setString(2, authors2);
+					    	updateauthstmt2.setString(3, affil2);
+					    	updateauthstmt2.executeUpdate();
+					    //}
+				    	
+			    	String updatewritten= "insert ignore into written(paperid, email, contribution) values(?,?,?)";
+			    	PreparedStatement updatewritstmt = connect.prepareStatement(updatewritten);
+			    	updatewritstmt.setInt(1, paperid);
+			    	updatewritstmt.setString(2, emails);
+			    	updatewritstmt.setInt(3, Integer.parseInt(con));
+			    	updatewritstmt.executeUpdate();
+			    	
+			    	String updatewritten2= "insert ignore into written(paperid, email, contribution) values(?,?,?)";
+			    	PreparedStatement updatewritstmt2 = connect.prepareStatement(updatewritten2);
+			    	updatewritstmt2.setInt(1, paperid);
+			    	updatewritstmt2.setString(2, emails2);
+			    	updatewritstmt2.setInt(3, Integer.parseInt(con2));
+			    	updatewritstmt2.executeUpdate();
+
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public void updaterev(String rid, String date, String comment, String rec) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+		              + "user=root&password=root");
+			
+
+			
+			if(date == "" && comment=="") {
+				String updaterev= "update review set recommendation = ? where reportid = ?";
+				PreparedStatement updaterevstmt = connect.prepareStatement(updaterev);
+				updaterevstmt.setString(1, rec);
+				updaterevstmt.setInt(2, Integer.parseInt(rid));
+				updaterevstmt.executeUpdate();
+			}
+			else if(date == "" && rec=="") {
+				String updaterev= "update review set comment = ? where reportid = ?";
+				PreparedStatement updaterevstmt = connect.prepareStatement(updaterev);
+				updaterevstmt.setString(1, comment);
+				updaterevstmt.setInt(2, Integer.parseInt(rid));
+				updaterevstmt.executeUpdate();
+			}
+			else if(comment == "" && rec=="") {
+				String updaterev= "update review set sdate = ? where reportid = ?";
+				PreparedStatement updaterevstmt = connect.prepareStatement(updaterev);
+				updaterevstmt.setDate(1, java.sql.Date.valueOf(date));
+				updaterevstmt.setInt(2, Integer.parseInt(rid));
+				updaterevstmt.executeUpdate();
+			}
+			else if(rec == "") {
+				String updaterev= "update review set sdate = ?, comment = ? where reportid = ?";
+				PreparedStatement updaterevstmt = connect.prepareStatement(updaterev);
+				updaterevstmt.setDate(1, java.sql.Date.valueOf(date));
+				updaterevstmt.setString(2, comment);
+				updaterevstmt.setInt(3, Integer.parseInt(rid));
+				updaterevstmt.executeUpdate();
+			}
+			else if(date == "") {
+				String updaterev= "update review set recommendation = ?, comment = ? where reportid = ?";
+				PreparedStatement updaterevstmt = connect.prepareStatement(updaterev);
+				updaterevstmt.setString(1, rec);
+				updaterevstmt.setString(2, comment);
+				updaterevstmt.setInt(3, Integer.parseInt(rid));
+				updaterevstmt.executeUpdate();
+			}
+			else if(comment == "") {
+				String updaterev= "update review set sdate = ?, recommendation = ? where reportid = ?";
+				PreparedStatement updaterevstmt = connect.prepareStatement(updaterev);
+				updaterevstmt.setDate(1, java.sql.Date.valueOf(date));
+				updaterevstmt.setString(2, rec);
+				updaterevstmt.setInt(3, Integer.parseInt(rid));
+				updaterevstmt.executeUpdate();
+			}
+			else {
+				String updaterev= "update review set sdate = ?, recommendation = ?, comment = ? where reportid = ?";
+				PreparedStatement updaterevstmt = connect.prepareStatement(updaterev);
+				updaterevstmt.setDate(1, java.sql.Date.valueOf(date));
+				updaterevstmt.setString(2, rec);
+				updaterevstmt.setString(3, comment);
+				updaterevstmt.setInt(4, Integer.parseInt(rid));
+				updaterevstmt.executeUpdate();
+			}
+
+
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public void deleterev(String rid) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+		              + "user=root&password=root");
+
+			String updaterev= "delete from review where reportid = ?";
+			PreparedStatement updaterevstmt = connect.prepareStatement(updaterev);
+			updaterevstmt.setInt(1, Integer.parseInt(rid));
+			updaterevstmt.executeUpdate();
+
+
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public void newrev(String date, String comment, String rec, String paperid, String email) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+		              + "user=root&password=root");
+
+			String updaterev= "insert into review(sdate, comment, recommendation, paperid, email) values(?,?,?,?,?)";
+			PreparedStatement updaterevstmt = connect.prepareStatement(updaterev);
+			updaterevstmt.setDate(1, java.sql.Date.valueOf(date));
+			updaterevstmt.setString(2, comment);
+			updaterevstmt.setString(3, rec);
+			updaterevstmt.setInt(4, Integer.parseInt(paperid));
+			updaterevstmt.setString(5, email);
+			updaterevstmt.executeUpdate();
+
+
+		} catch(SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+public List<Object> mostrev() throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+	try {
+		
+		Class.forName("com.mysql.jdbc.Driver").newInstance();
+		Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+	              + "user=root&password=root");
+		
+		List<Object> list = new ArrayList<>();
+		int revcount = 0;
+		
+	    String mostrev = "select email, count(*) from review group by email";
+	    PreparedStatement mostrevstmt = connect.prepareStatement(mostrev); 
+	    ResultSet mostrevresult = mostrevstmt.executeQuery();
+	    //ResultSet resultSet  = preparestatement.executeUpdate();
+	    while(mostrevresult.next()){
+	    	if(revcount < mostrevresult.getInt("count(*)")){
+	    		revcount = mostrevresult.getInt("count(*)");
+	    	}
+	    	}
+		mostrevresult.beforeFirst();
+		
+	    while(mostrevresult.next()){
+	    	if(revcount == mostrevresult.getInt("count(*)")){
+	    		
+	    		String findName = "select name from pcmember where email = ?";
+	    		PreparedStatement findNamestmt = connect.prepareStatement(findName);
+	    		findNamestmt.setString(1, mostrevresult.getString("email"));
+	    		ResultSet pcnames = findNamestmt.executeQuery();
+	    		while(pcnames.next()) {
+	    			User user = new User();
+	    			user.setEmail(pcnames.getString("name"));
+	    			list.add(user);
+	    		
+	    	}
+	    	}
+	    }
+	    	return list;
+	    
+		
+	} catch(SQLException e) {
+		throw new RuntimeException(e);
+	}
+}
+public List<Object> norev() throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+	try {
+		
+		Class.forName("com.mysql.jdbc.Driver").newInstance();
+		Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/sampledb?"
+	              + "user=root&password=root");
+		
+		List<Object> list = new ArrayList<>();
+		
+	    String norev = "select name from pcmember where not exists (select * from review where pcmember.email = review.email)";
+	    PreparedStatement norevstmt = connect.prepareStatement(norev); 
+	    ResultSet norevresult = norevstmt.executeQuery();
+	    //ResultSet resultSet  = preparestatement.executeUpdate();
+	    while(norevresult.next()){
+
+	    	User user = new User();
+	    	user.setEmail(norevresult.getString("email"));
+	    	list.add(user);
+	    	}
+
+	    	return list;
+	    
+		
+	} catch(SQLException e) {
+		throw new RuntimeException(e);
+	}
+}
+}
+

@@ -28,10 +28,10 @@
   3. 回显
    --%>
 <p style="color: red; font-weight: 900">${msg }</p>
-<form action="<c:url value='/UserServletUpdate'/>" method="post">
+<form action="<c:url value='/UserServletUpdaterev'/>" method="post">
 	<input type="hidden" name="method" value="update"/>
-	Paper Name to Search:<input type="text" name="papern" value="${form.papern }"/>
-	<span style="color: red; font-weight: 900">${errors.papern }</span>
+	Report ID to Search:<input type="text" name="rid" value="${form.rid }"/>
+	<span style="color: red; font-weight: 900">${errors.rid }</span>
 	<br/>
 	Date Change:<input type="text" name="date" value="${form.date }"/>
 	<span style="color: red; font-weight: 900">${errors.date }</span>
@@ -46,10 +46,31 @@
 </form>
 <h1>Delete Review</h1>
 <p style="color: red; font-weight: 900">${msg }</p>
-<form action="<c:url value='/UserServletUpdate'/>" method="post">
+<form action="<c:url value='/UserServletDeleterev'/>" method="post">
 	<input type="hidden" name="method" value="update"/>
-	Paper Name:<input type="text" name="papern" value="${form.papern }"/>
-	<span style="color: red; font-weight: 900">${errors.papern }</span>
+	Report ID:<input type="text" name="rid" value="${form.rid }"/>
+	<span style="color: red; font-weight: 900">${errors.rid }</span>
+	<br/>
+	<input type="submit" value="Submit"/>
+</form>
+<h1>New Review</h1>
+<p style="color: red; font-weight: 900">${msg }</p>
+<form action="<c:url value='/UserServletNewrev'/>" method="post">
+	<input type="hidden" name="method" value="update"/>
+	Date:<input type="text" name="date" value="${form.date }"/>
+	<span style="color: red; font-weight: 900">${errors.date }</span>
+	<br/>
+	Comment：<input type="text" name="comment" value="${form.comment }"/>
+	<span style="color: red; font-weight: 900">${errors.comment }</span>
+	<br/>
+	Recommendation：<input type="text" name="recomend" value="${form.recomend }"/>
+	<span style="color: red; font-weight: 900">${errors.recomend }</span>
+	<br/>
+	Paper ID：<input type="text" name="paperid" value="${form.paperid }"/>
+	<span style="color: red; font-weight: 900">${errors.paperid }</span>
+	<br/>
+	Reviewer Email：<input type="text" name="email" value="${form.email }"/>
+	<span style="color: red; font-weight: 900">${errors.email }</span>
 	<br/>
 	<input type="submit" value="Submit"/>
 </form>
